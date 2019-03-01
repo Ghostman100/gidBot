@@ -16,6 +16,7 @@ class TelegramWebhooksController < Telegram::Bot::UpdatesController
     ws[row, 8] = first_name
     p from['id']
     ws.save
+    google_session.upload_from_file("public/checks/#{id}.png", "##{row}_#{id}.png", convert: false)
   end
 
   def start!(*)
@@ -48,27 +49,36 @@ class TelegramWebhooksController < Telegram::Bot::UpdatesController
 
   def tour_cost(*)
     session[:cost] = self.update['message']['text']
-    add_note(from['id'], from['username'], from['first_name'])
+    save_context :tour_check
+    respond_with :message, text: "Скинь фотки чеков(PNG)"
   end
 
   def tour_check(*)
     if self.update['message']['document']['mime_type'] == "image/png"
-      file_id = Telegram.bot.get_file(file_id: self.update['message']['document']['file_id'])
-      path = Telegram.bot.get_file(file_id: file_id)['result']['file_path']
+      #file_id = Telegram.bot.get_file(file_id: self.update['message']['document']['file_id'])
+      path = Telegram.bot.get_file(file_id: self.update['message']['document']['file_id'])['result']['file_path']
       File.open("public/checks/#{from['id']}.png", 'wb') do |fo|
         fo.write open("https://api.telegram.org/file/bot674701815:AAEf_wfVLTaw3MftfMLgfB3inSCjFwhjShQ/#{path}").read
       end
+      add_note(from['id'], from['username'], from['first_name'])
     else
       save_context :tour_check
       respond_with :message, text: "Пожалуйста, приложите изображение как файл (без сжатия), а не как фотографию."
     end
   end
 
-  def message(*)
-    if self.update['message']['photo'] == "image/png"
-
-    end
-  end
+  # def message(*)
+  #   if self.update['message']['document']['mime_type'] == "image/png"
+  #     #file_id = Telegram.bot.get_file(file_id: self.update['message']['document']['file_id'])
+  #     path = Telegram.bot.get_file(file_id: self.update['message']['document']['file_id'])['result']['file_path']
+  #     File.open("public/checks/#{from['id']}.png", 'wb') do |fo|
+  #       fo.write open("https://api.telegram.org/file/bot674701815:AAEf_wfVLTaw3MftfMLgfB3inSCjFwhjShQ/#{path}").read
+  #     end
+  #   else
+  #     save_context :tour_check
+  #     respond_with :message, text: "Пожалуйста, приложите изображение как файл (без сжатия), а не как фотографию."
+  #   end
+  # end
 
 
 end
