@@ -15,8 +15,9 @@ class TelegramWebhooksController < Telegram::Bot::UpdatesController
     ws[row, 7] = username
     ws[row, 8] = first_name
     p from['id']
+    a = google_session.upload_from_file("public/checks/#{id}.png", "#{row}_#{id}.png", convert: false)
+    ws[row, 9] = a.web_view_link
     ws.save
-    google_session.upload_from_file("public/checks/#{id}.png", "##{row}_#{id}.png", convert: false)
   end
 
   def start!(*)
@@ -63,7 +64,7 @@ class TelegramWebhooksController < Telegram::Bot::UpdatesController
       add_note(from['id'], from['username'], from['first_name'])
     else
       save_context :tour_check
-      respond_with :message, text: "Пожалуйста, приложите изображение как файл (без сжатия), а не как фотографию."
+      respond_with :message, text: "Пожалуйста, приложите изображение как файл (без сжатия), а не как фотографию.(PNG)"
     end
   end
 
