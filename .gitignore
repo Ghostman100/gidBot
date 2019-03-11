@@ -32,6 +32,8 @@
 public/assets/*
 db/schema.rb
 /config/application.yml
+public/checks/*
+public/photo/*
 config/database.yml
 config/initializers/bot_initializer.rb
 .idea/*
